@@ -26,22 +26,22 @@ def send_email():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
-    service = build('gmail', 'v1', credentials=creds)
-    message = MIMEText('This is a kafka alert')
-    message['to'] = RECIPIENT_EMAIL
-    message['subject'] = '[ALERT] Calories greater than threshold'
-    create_message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
+    service = build("gmail", "v1", credentials=creds)
+    message = MIMEText("This is a kafka alert")
+    message["to"] = RECIPIENT_EMAIL
+    message["subject"] = "[ALERT] Calories greater than threshold"
+    create_message = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
     try:
-        message = (service.users().messages().send(userId="me", body=create_message).execute())
-        print(F'sent message to {message} Message Id: {message["id"]}')
+        message = (
+            service.users().messages().send(userId="me", body=create_message).execute()
+        )
+        print(f'sent message to {message} Message Id: {message["id"]}')
     except HTTPError as error:
-        print(F'An error occurred: {error}')
+        print(f"An error occurred: {error}")
         message = None
